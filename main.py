@@ -1,23 +1,22 @@
 import argparse
 from pathlib import Path
-from typing import Callable
 
 from image import label_images
-from text import label_texts
-from util import infer_mode
+from text import TextLabelJob
+from util import LabelJob, infer_mode
 
 
-def get_label_function(mode: str) -> Callable:
+def get_label_job(mode: str) -> LabelJob:
     if mode == "image":
-        return label_images
+        return label_images # TODO
     if mode == "text":
-        return label_texts
+        return TextLabelJob()
     return None
 
 
 def run(mode: str, labels: str, source: Path, out: Path):
-    label_function = get_label_function(mode)
-    label_df = label_function(source, labels)
+    label_job = get_label_job(mode)
+    label_df = label_job.start(source, labels)
     label_df.to_csv(out, index=False)
 
 

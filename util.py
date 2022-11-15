@@ -1,9 +1,19 @@
 from pathlib import Path
 from typing import Dict, Sequence
 
+import pandas as pd
+
 
 IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 TEXT_EXTENSIONS = [".txt"]
+
+
+class LabelJob:
+    def __init__(self):
+        pass
+
+    def start(self, source_directory: Path, label_type: str) -> pd.DataFrame:
+        pass
 
 
 def get_image_files(directory: Path) -> Sequence[Path]:
