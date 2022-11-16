@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn import svm
 
-from util import LabelJob, get_text_files, get_user_command
+from activelabel.util import LabelJob, get_text_files, get_user_command
 
 
 class TextLabelJob(LabelJob):

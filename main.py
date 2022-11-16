@@ -1,9 +1,9 @@
 import argparse
 from pathlib import Path
 
-from image import label_images
-from text import TextLabelJob
-from util import LabelJob, infer_mode
+from activelabel.image import label_images
+from activelabel.text import TextLabelJob
+from activelabel.util import LabelJob, infer_mode
 
 
 def get_label_job(mode: str) -> LabelJob:
