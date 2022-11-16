@@ -22,6 +22,7 @@ class TextLabelJob(LabelJob):
         self.stopwords = nltk.corpus.stopwords.words("english")
         self.stemmer = nltk.stem.PorterStemmer()
         self.lemmatizer = nltk.stem.WordNetLemmatizer()
+        self.word2vec = gensim_api.load("word2vec-google-news-300")
 
     def get_text_classification_model(self):
         return svm.SVC()
@@ -34,8 +35,8 @@ class TextLabelJob(LabelJob):
         lst_text = [self.lemmatizer.lemmatize(word) for word in lst_text]
         return lst_text
 
-    def vectorize_text(self, text: Sequence[str], word2vec, max_length: int = 1500):
-        arr = np.concatenate([word2vec[word] for word in text])
+    def vectorize_text(self, text: Sequence[str], max_length: int = 1500):
+        arr = np.concatenate([self.word2vec[word] for word in text])
         arr = np.pad(arr, (max_length - len(arr), 0), "constant")
         return arr
 
@@ -60,8 +61,6 @@ class TextLabelJob(LabelJob):
 
         label_df = pd.DataFrame(columns=["filename", "label"])
 
-        word2vec = gensim_api.load("word2vec-google-news-300")
-
         model, is_fit, interval = self.get_text_classification_model(), False, 3
         train_X, train_y = [], []
 
@@ -69,7 +68,7 @@ class TextLabelJob(LabelJob):
             text = file.read_text()
 
             processed_text = self.preprocess_text(text)
-            vectorized_text = self.vectorize_text(processed_text, word2vec, max_length)
+            vectorized_text = self.vectorize_text(processed_text, max_length)
 
             if i > 0 and i % interval == 0:
                 model = model.fit(train_X, train_y)
