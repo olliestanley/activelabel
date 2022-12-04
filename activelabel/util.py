@@ -2,18 +2,30 @@ from pathlib import Path
 from typing import Dict, Sequence
 
 import pandas as pd
+from torch.utils.data import Dataset
 
 
 IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 TEXT_EXTENSIONS = [".txt"]
 
 
-class LabelJob:
-    def __init__(self):
-        pass
+class ModelWrapper:
+    def fit(self, data: Dataset):
+        raise NotImplementedError("Implement this method.")
 
-    def start(self, source_directory: Path, label_type: str) -> pd.DataFrame:
-        pass
+    def predict_with_confidence(self, input) -> tuple:
+        raise NotImplementedError("Implement this method.")
+
+
+class LabelJob:
+    def __init__(self, model: ModelWrapper, interval: int = 50):
+        self.model = model
+        self.interval = interval
+
+    def run(
+        self, source_directory: Path, initial: pd.DataFrame = None
+    ) -> pd.DataFrame:
+        raise NotImplementedError("Implement this method.")
 
 
 def get_image_files(directory: Path) -> Sequence[Path]:
