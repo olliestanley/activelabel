@@ -1,4 +1,5 @@
 import re
+from typing import Tuple
 
 import gensim.downloader as gensim_api
 import nltk
@@ -15,6 +16,22 @@ class ClassifierWrapper(ModelWrapper):
 
         self.classes = classes
         self.class_map = {cl: i for i, cl in enumerate(classes)}
+
+
+class CNNTextClassifier(ClassifierWrapper):
+    def __init__(self, classes, image_shape: Tuple[int, int, int]):
+        super().__init__(classes)
+
+        self.image_shape = image_shape
+        # TODO
+
+    def fit(self, data: Dataset):
+        # TODO
+        pass
+
+    def predict_with_confidence(self, input) -> tuple:
+        # TODO
+        pass
 
 
 class Word2VecSVCTextClassifier(ClassifierWrapper):
