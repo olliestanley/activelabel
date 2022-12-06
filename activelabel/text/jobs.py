@@ -44,6 +44,7 @@ class TextClassificationLabelJob(LabelJob):
                 if status < 0:
                     return
 
+            print("Updating model and predictions...")
             self.model.fit(self.dataset)
             self.update_predictions()
 
