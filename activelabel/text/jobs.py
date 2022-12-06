@@ -4,12 +4,12 @@ import numpy as np
 import pandas as pd
 
 from activelabel.text.data import TextClassificationDataset
-from activelabel.text.models import TextClassifier
+from activelabel.text.models import ClassifierWrapper
 from activelabel.util import LabelJob
 
 
 class TextClassificationLabelJob(LabelJob):
-    def __init__(self, model: TextClassifier, interval: int = 50):
+    def __init__(self, model: ClassifierWrapper, interval: int = 50):
         super().__init__(model, interval)
 
         self.preds = []

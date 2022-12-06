@@ -9,7 +9,7 @@ from torch.utils.data import Dataset
 from activelabel.util import ModelWrapper
 
 
-class TextClassifier(ModelWrapper):
+class ClassifierWrapper(ModelWrapper):
     def __init__(self, classes):
         super().__init__()
 
@@ -17,7 +17,7 @@ class TextClassifier(ModelWrapper):
         self.class_map = {cl: i for i, cl in enumerate(classes)}
 
 
-class Word2VecSVCTextClassifier(TextClassifier):
+class Word2VecSVCTextClassifier(ClassifierWrapper):
     def __init__(self, classes, max_length: int = 500):
         super().__init__(classes)
 
