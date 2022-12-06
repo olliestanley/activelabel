@@ -40,14 +40,14 @@ class TextClassificationLabelJob(LabelJob):
     def perform_labelling(self):
         while True:
             for _ in range(self.interval):
-                status = self.perform_round()
+                status = self.label_sample()
                 if status < 0:
                     return
 
             self.model.fit(self.dataset)
             self.update_predictions()
 
-    def perform_round(self):
+    def label_sample(self):
         if not self.dataset.has_unlabelled_samples():
             return -1
 
