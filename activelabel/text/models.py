@@ -1,5 +1,4 @@
 import re
-from typing import Tuple
 
 import gensim.downloader as gensim_api
 import nltk
@@ -7,31 +6,7 @@ import numpy as np
 from sklearn import svm
 from torch.utils.data import Dataset
 
-from activelabel.util import ModelWrapper
-
-
-class ClassifierWrapper(ModelWrapper):
-    def __init__(self, classes):
-        super().__init__()
-
-        self.classes = classes
-        self.class_map = {cl: i for i, cl in enumerate(classes)}
-
-
-class CNNTextClassifier(ClassifierWrapper):
-    def __init__(self, classes, image_shape: Tuple[int, int, int]):
-        super().__init__(classes)
-
-        self.image_shape = image_shape
-        # TODO
-
-    def fit(self, data: Dataset):
-        # TODO
-        pass
-
-    def predict_with_confidence(self, input) -> tuple:
-        # TODO
-        pass
+from activelabel.util import ClassifierWrapper
 
 
 class Word2VecSVCTextClassifier(ClassifierWrapper):

@@ -17,6 +17,14 @@ class ModelWrapper:
         raise NotImplementedError("Implement this method.")
 
 
+class ClassifierWrapper(ModelWrapper):
+    def __init__(self, classes):
+        super().__init__()
+
+        self.classes = classes
+        self.class_map = {cl: i for i, cl in enumerate(classes)}
+
+
 class LabelJob:
     def __init__(self, model: ModelWrapper, interval: int = 50):
         self.model = model
