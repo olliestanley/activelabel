@@ -2,7 +2,7 @@ import random
 
 from torch.utils.data import Dataset
 
-from activelabel.util import get_text_files
+from activelabel.bases import get_text_files
 
 
 class TextClassificationDataset(Dataset):

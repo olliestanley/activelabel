@@ -1,11 +1,12 @@
 from pathlib import Path
+from typing import Any, Tuple
 
 import numpy as np
 import pandas as pd
 
 from activelabel.text.data import TextClassificationDataset
 from activelabel.text.models import ClassifierWrapper
-from activelabel.util import LabelJob
+from activelabel.bases import LabelJob
 
 
 class TextClassificationLabelJob(LabelJob):
@@ -15,9 +16,7 @@ class TextClassificationLabelJob(LabelJob):
         self.preds = []
         self.confs = []
 
-    def run(
-        self, source_directory: Path, initial: pd.DataFrame = None
-    ) -> pd.DataFrame:
+    def setup(self, source_directory: Path, initial: pd.DataFrame = None) -> None:
         if initial is None:
             self.labels = {
                 "filename": [],
@@ -33,39 +32,18 @@ class TextClassificationLabelJob(LabelJob):
         self.confs = [0 for _ in range(len(self.dataset))]
         self.preds = [self.model.classes[c] for c in self.confs]
 
-        self.perform_labelling()
+    def next_sample(self) -> Tuple[str, Any, Any, float]:
+        confs = self.confs.copy()
 
-        return pd.DataFrame.from_dict(self.labels)
+        index = np.argmin(confs)
+        while self.dataset.has_label(index):
+            confs[index] = 10
+            index = np.argmin(confs)
 
-    def perform_labelling(self):
-        while True:
-            for _ in range(self.interval):
-                status = self.label_sample()
-                if status < 0:
-                    return
+        return self.dataset.files[index], index, self.preds[index], confs[index]
 
-            print("Updating model and predictions...")
-            self.model.fit(self.dataset)
-            self.update_predictions()
-
-    def label_sample(self):
-        if not self.dataset.has_unlabelled_samples():
-            return -1
-
-        index, pred, conf = self.get_lowest_confidence()
-        text, _ = self.dataset[index]
-
-        print(text)
-        print(f"Predicted: {pred} (Confidence: {round(conf, 3)})")
-
-        label = input()
-
-        if label == "exit":
-            return -2
-
-        self.labels["filename"].append(self.dataset.files[index])
-        self.labels["label"].append(label)
-        return 0
+    def update_model(self):
+        self.model.fit(self.dataset)
 
     def update_predictions(self):
         preds, confs = [], []
@@ -76,13 +54,3 @@ class TextClassificationLabelJob(LabelJob):
             confs.append(conf)
 
         self.preds, self.confs = preds, confs
-
-    def get_lowest_confidence(self):
-        confs = self.confs.copy()
-
-        index = np.argmin(confs)
-        while self.dataset.has_label(index):
-            confs[index] = 10
-            index = np.argmin(confs)
-
-        return index, self.preds[index], confs[index]
