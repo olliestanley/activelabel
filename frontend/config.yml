@@ -3,12 +3,12 @@ Mode: text
 # Options: [class]
 Label-Type: class
 
-# Number of samples to obtain labels for between each retraining
-Retrain-Interval: 5
-
 # Directory containing data
 Data-Directory: data/raw
 # CSV with current labels
 Input-Labels: data/input_labels.csv
 # CSV to output final labels
 Output-Labels: data/output_labels.csv
+
+# Number of samples to obtain labels for between each retraining
+Retrain-Interval: 5
