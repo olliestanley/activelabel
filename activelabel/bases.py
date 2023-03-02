@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any, Tuple
 
-import pandas as pd
+import polars as pl
 from torch.utils.data import Dataset
 
 
@@ -26,7 +26,7 @@ class LabelJob:
         self.model = model
         self.interval = interval
 
-    def setup(self, source_directory: Path, initial: pd.DataFrame = None) -> None:
+    def setup(self, source_directory: Path, initial: pl.DataFrame = None) -> None:
         raise NotImplementedError("Implement this method.")
 
     def next_sample(self) -> Tuple[str, Any, Any, float]:

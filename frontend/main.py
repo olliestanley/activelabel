@@ -4,7 +4,7 @@ from pathlib import Path
 from activelabel import LabelJob
 from activelabel.text.jobs import TextClassificationLabelJob
 from activelabel.text.models import Word2VecSVCTextClassifier
-import pandas as pd
+import polars as pl
 
 from util import PathLike, infer_mode
 
@@ -58,14 +58,14 @@ def main(
     source, out, initial = Path(source), Path(out), Path(initial)
     mode = infer_mode(source) if mode == "infer" else mode
 
-    initial_df = pd.read_csv(initial) if initial.exists() else None
+    initial_df = pl.read_csv(initial) if initial.exists() else None
 
     label_job = get_job(mode, label_type, interval)
     label_job.setup(source, initial_df)
 
     perform_labelling(label_job)
 
-    label_df = pd.DataFrame.from_dict(label_job.labels)
+    label_df = pl.from_dict(label_job.labels)
     label_df.to_csv(out, index=False)
 
 

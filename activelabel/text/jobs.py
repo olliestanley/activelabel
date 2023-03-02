@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any, Tuple
 
 import numpy as np
-import pandas as pd
+import polars as pl
 
 from activelabel.text.data import TextClassificationDataset
 from activelabel.text.models import ClassifierWrapper
@@ -16,14 +16,14 @@ class TextClassificationLabelJob(LabelJob):
         self.preds = []
         self.confs = []
 
-    def setup(self, source_directory: Path, initial: pd.DataFrame = None) -> None:
+    def setup(self, source_directory: Path, initial: pl.DataFrame = None) -> None:
         if initial is None:
             self.labels = {
                 "filename": [],
                 "label": [],
             }
         else:
-            self.labels = initial.to_dict("list")
+            self.labels = initial.to_dict(as_series=False)
 
         self.dataset = TextClassificationDataset(
             source_directory, self.labels, self.model.class_map
