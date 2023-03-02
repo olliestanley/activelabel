@@ -1,4 +1,5 @@
 import argparse
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 import yaml
@@ -7,16 +8,6 @@ from activelabel import LabelJob
 from activelabel.text.jobs import TextClassificationLabelJob
 from activelabel.text.models import Word2VecSVCTextClassifier
 import polars as pl
-
-
-class Config:
-    def __init__(self, config: dict[str, Any]):
-        self.mode = config["Mode"]
-        self.label_type = config["Label-Type"]
-        self.source = Path(config["Data-Directory"])
-        self.out = Path(config["Input-Labels"])
-        self.initial = Path(config["Output-Labels"])
-        self.interval = int(config["Retrain-Interval"])
 
 
 def perform_labelling(label_job: LabelJob) -> None:
@@ -57,8 +48,24 @@ def get_job(mode: str, label_type: str, interval: int) -> LabelJob:
     raise NotImplementedError(f"Unavailable mode / label type combination: {mode} / {label_type}")
 
 
+@dataclass
+class Config:
+    mode: str
+    label_type: str
+    source: Path
+    out: Path
+    initial: Path
+    interval: int
+
+    def __post_init__(self):
+        self.source = Path(self.source)
+        self.out = Path(self.out)
+        self.initial = Path(self.initial)
+        self.interval = int(self.interval)
+
+
 def main(config_dict: dict[str, Any]) -> None:
-    config = Config(config_dict)
+    config = Config(**config_dict)
 
     initial_df = pl.read_csv(config.initial) if config.initial.exists() else None
 
