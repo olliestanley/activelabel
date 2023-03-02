@@ -1,14 +1,15 @@
 import argparse
 from pathlib import Path
 
-from activelabel import JobManager, LabelJob
+from activelabel import LabelJob
+from activelabel.text.jobs import TextClassificationLabelJob
+from activelabel.text.models import Word2VecSVCTextClassifier
 import pandas as pd
 
-import util
-from util import PathLike
+from util import PathLike, infer_mode
 
 
-def perform_labelling(label_job: LabelJob):
+def perform_labelling(label_job: LabelJob) -> None:
     while True:
         for _ in range(label_job.interval):
             status = label_sample(label_job)
@@ -20,7 +21,7 @@ def perform_labelling(label_job: LabelJob):
         label_job.update_predictions()
 
 
-def label_sample(label_job: LabelJob):
+def label_sample(label_job: LabelJob) -> int:
     identifier, sample, pred, conf = label_job.next_sample()
     if sample is None:
         return -1
@@ -37,6 +38,15 @@ def label_sample(label_job: LabelJob):
     return 0
 
 
+def get_job(mode: str, label_type: str, interval: int) -> LabelJob:
+    if mode == "text":
+        if label_type == "class":
+            model = Word2VecSVCTextClassifier(["+", "-", "="])
+            return TextClassificationLabelJob(model, interval=interval)
+
+    raise NotImplementedError(f"Unavailable mode / label type combination: {mode} / {label_type}")
+
+
 def main(
     mode: str = "infer",
     label_type: str = "class",
@@ -44,14 +54,13 @@ def main(
     out: PathLike = "data/output_labels.csv",
     initial: PathLike = "data/input_labels.csv",
     interval: int = 10,
-):
+) -> None:
     source, out, initial = Path(source), Path(out), Path(initial)
-    mode = util.infer_mode(source) if mode == "infer" else mode
+    mode = infer_mode(source) if mode == "infer" else mode
 
     initial_df = pd.read_csv(initial) if initial.exists() else None
 
-    job_manager = JobManager(mode, label_type)
-    label_job = job_manager.get_job(interval=interval)
+    label_job = get_job(mode, label_type, interval)
     label_job.setup(source, initial_df)
 
     perform_labelling(label_job)

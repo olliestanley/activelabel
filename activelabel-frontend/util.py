@@ -1,27 +1,26 @@
+from enum import Enum
 from pathlib import Path
-from typing import Sequence, Union
 
 IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg"]
 TEXT_EXTENSIONS = [".txt"]
 
-PathLike = Union[Path, str]
+PathLike = Path | str
 
 
-def get_image_files(directory: Path) -> Sequence[Path]:
-    return [
-        file for file in directory.iterdir()
-        if file.suffix in IMAGE_EXTENSIONS
-    ]
+class LabelMode(Enum, str):
+    IMAGE = "image"
+    TEXT = "text"
 
 
-def get_text_files(directory: Path) -> Sequence[Path]:
-    return [
-        file for file in directory.iterdir()
-        if file.suffix in TEXT_EXTENSIONS
-    ]
+def count_image_files(directory: Path) -> int:
+    return sum(1 for file in directory.iterdir() if file.suffix in IMAGE_EXTENSIONS)
 
 
-def infer_mode(source_directory: Path) -> str:
-    num_images = len(get_image_files(source_directory))
-    num_texts = len(get_text_files(source_directory))
-    return "image" if num_images >= num_texts else "text"
+def count_text_files(directory: Path) -> int:
+    return sum(1 for file in directory.iterdir() if file.suffix in TEXT_EXTENSIONS)
+
+
+def infer_mode(source_directory: Path) -> LabelMode:
+    num_images = count_image_files(source_directory)
+    num_texts = count_image_files(source_directory)
+    return LabelMode.IMAGE if num_images >= num_texts else LabelMode.TEXT

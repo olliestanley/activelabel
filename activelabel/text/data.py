@@ -1,18 +1,26 @@
+from pathlib import Path
 import random
 
 from torch.utils.data import Dataset
 
-from activelabel.bases import get_text_files
+TEXT_EXTENSIONS = [".txt"]
+
+
+def get_text_files(directory: Path) -> list[Path]:
+    return [
+        file for file in directory.iterdir()
+        if file.suffix in TEXT_EXTENSIONS
+    ]
 
 
 class TextClassificationDataset(Dataset):
-    def __init__(self, directory, labels, label_map):
+    def __init__(self, directory: Path, labels: dict[str, list], label_map):
         self.files = get_text_files(directory)
         random.shuffle(self.files)
         self.labels = labels
         self.label_map = label_map
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
         file = self.files[index]
         text = file.read_text()
 
