@@ -66,7 +66,7 @@ def main(
     perform_labelling(label_job)
 
     label_df = pl.from_dict(label_job.labels)
-    label_df.to_csv(out, index=False)
+    label_df.write_csv(out)
 
 
 if __name__ == "__main__":
