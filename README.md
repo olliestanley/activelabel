@@ -1,4 +1,4 @@
-## activelabel
+## activelabel
 
 Active learning system for ML-assisted data labelling.
 
@@ -6,6 +6,6 @@ Active learning system for ML-assisted data labelling.
 
 activelabel is not yet ready for production use.
 
-### Development Setup
+### Development Setup
 
 Python 3.10 is required with the requirements in `requirements-dev.txt`.
