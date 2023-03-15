@@ -1,29 +1,31 @@
-from pathlib import Path
 import random
+from pathlib import Path
 
 from torch.utils.data import Dataset
 
-from activelabel.util import CachedFunctionKV
+from activelabel.util import CachedFunctionKV, get_text
 
 TEXT_EXTENSIONS = [".txt"]
 
 
 def get_text_files(directory: Path) -> list[Path]:
-    return [
-        file for file in directory.iterdir()
-        if file.suffix in TEXT_EXTENSIONS
-    ]
+    return [file for file in directory.iterdir() if file.suffix in TEXT_EXTENSIONS]
 
 
 class TextClassificationDataset(Dataset):
-    def __init__(self, directory: Path, labels: dict[str, list], label_map, use_cache: bool = False):
+    def __init__(
+        self,
+        directory: Path,
+        labels: dict[str, list],
+        label_map,
+        use_cache: bool = False,
+    ):
         self.files = get_text_files(directory)
         random.shuffle(self.files)
         self.labels = labels
         self.label_map = label_map
 
-        text_reader = lambda file: file.read_text()
-        self.getter = CachedFunctionKV(text_reader) if use_cache else text_reader
+        self.getter = CachedFunctionKV(get_text) if use_cache else get_text
 
     def __getitem__(self, index: int):
         file = self.files[index]

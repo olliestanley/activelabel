@@ -1,9 +1,15 @@
+from pathlib import Path
 from typing import Any
 
 
 class LabelingError(Exception):
     """Raised when there is an error during labeling."""
+
     pass
+
+
+def get_text(file: Path) -> str:
+    return file.read_text()
 
 
 class CachedFunctionKV:

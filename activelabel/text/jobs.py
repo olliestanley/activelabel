@@ -5,9 +5,9 @@ import numpy as np
 import polars as pl
 
 from activelabel.bases import LabelJob
-from activelabel.util import LabelingError
 from activelabel.text.data import TextClassificationDataset
 from activelabel.text.models import ClassifierWrapper
+from activelabel.util import LabelingError
 
 
 class TextClassificationLabelJob(LabelJob):

@@ -26,7 +26,7 @@ class Word2VecSVCTextClassifier(ClassifierWrapper):
         self.max_length = max_length
 
     def preprocess_text(self, text: str) -> np.ndarray:
-        text = re.sub(r'[^\w\s]', '', str(text).lower().strip())
+        text = re.sub(r"[^\w\s]", "", str(text).lower().strip())
         lst_text = text.split()
         lst_text = [word for word in lst_text if word not in self.stopwords]
         lst_text = [self.stemmer.stem(word) for word in lst_text]
@@ -38,8 +38,7 @@ class Word2VecSVCTextClassifier(ClassifierWrapper):
     def fit(self, data: Dataset):
         datapoints = [data[i] for i in range(len(data))]
         train_x = [
-            self.preprocess_text(val[0])
-            for val in datapoints if val[1] is not None
+            self.preprocess_text(val[0]) for val in datapoints if val[1] is not None
         ]
         train_y = [val[1] for val in datapoints if val[1] is not None]
 

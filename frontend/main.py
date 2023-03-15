@@ -3,13 +3,14 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Any
+
+import polars as pl
 import yaml
 
 from activelabel import LabelJob
 from activelabel.text.jobs import TextClassificationLabelJob
 from activelabel.text.models import Word2VecSVCTextClassifier
 from activelabel.util import LabelingError
-import polars as pl
 
 
 class JobStatus(Enum, int):
@@ -64,7 +65,9 @@ def get_job(mode: str, label_type: str, interval: int) -> LabelJob:
             model = Word2VecSVCTextClassifier(["+", "-", "="])
             return TextClassificationLabelJob(model, interval=interval)
 
-    raise NotImplementedError(f"Unavailable mode / label type combination: {mode} / {label_type}")
+    raise NotImplementedError(
+        f"Unavailable mode / label type combination: {mode} / {label_type}"
+    )
 
 
 @dataclass
