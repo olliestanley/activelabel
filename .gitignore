@@ -5,3 +5,6 @@ __pycache__/
 
 data/
 venv/
+
+# Temporarily excluded while under development
+tests/
