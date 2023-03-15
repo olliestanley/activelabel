@@ -27,9 +27,13 @@ class LabelJob:
         self.interval = interval
 
     def setup(self, source_directory: Path, initial: pl.DataFrame = None) -> None:
+        """Raises LabelingError if no data to label."""
+
         raise NotImplementedError("Implement this method.")
 
     def next_sample(self) -> Tuple[str, Any, Any, float]:
+        """Raises LabelingError if no more samples to label."""
+
         raise NotImplementedError("Implement this method.")
 
     def update_model(self) -> None:

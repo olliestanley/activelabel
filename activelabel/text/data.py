@@ -46,5 +46,5 @@ class TextClassificationDataset(Dataset):
         except ValueError:
             return False
 
-    def has_unlabelled_samples(self):
-        return len(self.files) > len(self.labels["filename"])
+    def count_unlabelled_samples(self) -> int:
+        return len(self.files) - len(self.labels["filename"])

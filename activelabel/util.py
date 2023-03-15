@@ -1,6 +1,11 @@
 from typing import Any
 
 
+class LabelingError(Exception):
+    """Raised when there is an error during labeling."""
+    pass
+
+
 class CachedFunctionKV:
     def __init__(self, function: callable):
         self.function = function

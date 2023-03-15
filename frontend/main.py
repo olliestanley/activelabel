@@ -1,5 +1,6 @@
 import argparse
 from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
 from typing import Any
 import yaml
@@ -7,36 +8,54 @@ import yaml
 from activelabel import LabelJob
 from activelabel.text.jobs import TextClassificationLabelJob
 from activelabel.text.models import Word2VecSVCTextClassifier
+from activelabel.util import LabelingError
 import polars as pl
 
 
+class JobStatus(Enum, int):
+    OK = 0
+    COMPLETE = 1
+    EXIT = -1
+
+
 def perform_labelling(label_job: LabelJob) -> None:
+    complete = False
+
     while True:
         for _ in range(label_job.interval):
             status = label_sample(label_job)
-            if status < 0:
+
+            if status == JobStatus.COMPLETE:
+                complete = True
+                break
+
+            if status == JobStatus.EXIT:
                 return
 
-        print("Updating model and predictions...")
+        print("Updating model...")
         label_job.update_model()
-        label_job.update_predictions()
+
+        if not complete:
+            print("Updating predictions...")
+            label_job.update_predictions()
 
 
-def label_sample(label_job: LabelJob) -> int:
-    identifier, sample, pred, conf = label_job.next_sample()
-    if sample is None:
-        return -1
+def label_sample(label_job: LabelJob) -> JobStatus:
+    try:
+        identifier, sample, pred, conf = label_job.next_sample()
+    except LabelingError:
+        return JobStatus.COMPLETE
 
     print(sample)
     print(f"Predicted: {pred} (Confidence: {round(conf, 3)})")
 
     label = input()
     if label == "exit":
-        return -2
+        return JobStatus.EXIT
 
     label_job.labels["filename"].append(identifier)
     label_job.labels["label"].append(label)
-    return 0
+    return JobStatus.OK
 
 
 def get_job(mode: str, label_type: str, interval: int) -> LabelJob:
@@ -63,6 +82,8 @@ class Config:
         self.initial = Path(self.initial)
         self.interval = int(self.interval)
 
+        self.source.mkdir(parents=True, exist_ok=True)
+
 
 def main(config_dict: dict[str, Any]) -> None:
     config = Config(**config_dict)
@@ -73,6 +94,7 @@ def main(config_dict: dict[str, Any]) -> None:
     label_job.setup(config.source, initial_df)
 
     perform_labelling(label_job)
+    # TODO: save model
 
     label_df = pl.from_dict(label_job.labels)
     label_df.write_csv(config.out)

@@ -4,9 +4,10 @@ from typing import Any, Tuple
 import numpy as np
 import polars as pl
 
+from activelabel.bases import LabelJob
+from activelabel.util import LabelingError
 from activelabel.text.data import TextClassificationDataset
 from activelabel.text.models import ClassifierWrapper
-from activelabel.bases import LabelJob
 
 
 class TextClassificationLabelJob(LabelJob):
@@ -29,10 +30,16 @@ class TextClassificationLabelJob(LabelJob):
             source_directory, self.labels, self.model.class_map
         )
 
+        if len(self.dataset) == 0:
+            raise LabelingError("No data to label")
+
         self.confs = [0 for _ in range(len(self.dataset))]
         self.preds = [self.model.classes[c] for c in self.confs]
 
     def next_sample(self) -> Tuple[str, Any, Any, float]:
+        if self.dataset.count_unlabelled_samples() < 1:
+            raise LabelingError("No more samples to label")
+
         confs = self.confs.copy()
 
         index = np.argmin(confs)
