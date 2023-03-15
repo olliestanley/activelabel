@@ -3,6 +3,8 @@ import random
 
 from torch.utils.data import Dataset
 
+from activelabel.util import CachedFunctionKV
+
 TEXT_EXTENSIONS = [".txt"]
 
 
@@ -14,15 +16,18 @@ def get_text_files(directory: Path) -> list[Path]:
 
 
 class TextClassificationDataset(Dataset):
-    def __init__(self, directory: Path, labels: dict[str, list], label_map):
+    def __init__(self, directory: Path, labels: dict[str, list], label_map, use_cache: bool = False):
         self.files = get_text_files(directory)
         random.shuffle(self.files)
         self.labels = labels
         self.label_map = label_map
 
+        text_reader = lambda file: file.read_text()
+        self.getter = CachedFunctionKV(text_reader) if use_cache else text_reader
+
     def __getitem__(self, index: int):
         file = self.files[index]
-        text = file.read_text()
+        text = self.getter(file)
 
         try:
             label_index = self.labels["filename"].index(file)
