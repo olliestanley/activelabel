@@ -103,7 +103,7 @@ def main(config_dict: dict[str, Any]) -> None:
     perform_labelling(label_job)
     # TODO: save model
 
-    label_df = pl.from_dict(label_job.dataset.labels)
+    label_df = label_job.get_labels()
     label_df.write_csv(config.out)
 
 

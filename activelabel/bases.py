@@ -1,5 +1,6 @@
 from typing import Any
 
+import polars as pl
 from torch.utils.data import Dataset
 
 
@@ -45,4 +46,7 @@ class LabelJob:
         raise NotImplementedError("Implement this method.")
 
     def update_predictions(self) -> None:
+        raise NotImplementedError("Implement this method.")
+
+    def get_labels(self) -> pl.DataFrame:
         raise NotImplementedError("Implement this method.")

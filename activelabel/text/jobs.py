@@ -1,6 +1,7 @@
 from typing import Any, Tuple
 
 import numpy as np
+import polars as pl
 
 from activelabel.bases import ClassificationDataset, ClassifierWrapper, LabelJob
 from activelabel.util import LabelingError
@@ -50,3 +51,6 @@ class TextClassificationLabelJob(LabelJob):
             confs.append(conf)
 
         self.preds, self.confs = preds, confs
+
+    def get_labels(self) -> pl.DataFrame:
+        return pl.from_dict(self.dataset.labels)
