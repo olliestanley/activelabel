@@ -37,9 +37,7 @@ class Word2VecSVCTextClassifier(ClassifierWrapper):
 
     def fit(self, data: Dataset):
         datapoints = [data[i] for i in range(len(data))]
-        train_x = [
-            self.preprocess_text(val[0]) for val in datapoints if val[1] is not None
-        ]
+        train_x = [self.preprocess_text(val[0]) for val in datapoints if val[1] is not None]
         train_y = [val[1] for val in datapoints if val[1] is not None]
 
         self.model = svm.SVC(probability=True)
