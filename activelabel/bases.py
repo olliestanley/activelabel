@@ -1,4 +1,4 @@
-from typing import Any, Tuple
+from typing import Any
 
 from torch.utils.data import Dataset
 
@@ -33,9 +33,12 @@ class LabelJob:
         self.dataset = dataset
         self.interval = interval
 
-    def next_sample(self) -> Tuple[str, Any, Any, float]:
+    def next_sample(self) -> tuple[str, Any, Any, float]:
         """Raises LabelingError if no more samples to label."""
 
+        raise NotImplementedError("Implement this method.")
+
+    def add_label(self, identifier: str, label: Any) -> None:
         raise NotImplementedError("Implement this method.")
 
     def update_model(self) -> None:

@@ -55,10 +55,7 @@ def label_sample(label_job: LabelJob) -> JobStatus:
     if label == "exit":
         return JobStatus.EXIT
 
-    # TODO: this depends on the type of label job, is currently specific to TextClassificationLabelJob
-    # needs changing to be more general
-    label_job.dataset.labels["filename"].append(identifier)
-    label_job.dataset.labels["label"].append(label)
+    label_job.add_label(identifier, label)
     return JobStatus.OK
 
 

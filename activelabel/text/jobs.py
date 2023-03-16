@@ -34,10 +34,14 @@ class TextClassificationLabelJob(LabelJob):
 
         return self.dataset.files[index], index, self.preds[index], confs[index]
 
-    def update_model(self):
+    def add_label(self, identifier: str, label: Any) -> None:
+        self.dataset.labels["filename"].append(identifier)
+        self.dataset.labels["label"].append(label)
+
+    def update_model(self) -> None:
         self.model.fit(self.dataset)
 
-    def update_predictions(self):
+    def update_predictions(self) -> None:
         preds, confs = [], []
 
         for x, _ in self.dataset:
