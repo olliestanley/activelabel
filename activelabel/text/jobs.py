@@ -1,40 +1,25 @@
-from pathlib import Path
 from typing import Any, Tuple
 
 import numpy as np
-import polars as pl
 
-from activelabel.bases import LabelJob
-from activelabel.text.data import TextClassificationDataset
-from activelabel.text.models import ClassifierWrapper
+from activelabel.bases import ClassificationDataset, ClassifierWrapper, LabelJob
 from activelabel.util import LabelingError
 
 
 class TextClassificationLabelJob(LabelJob):
-    def __init__(self, model: ClassifierWrapper, interval: int = 50):
-        super().__init__(model, interval)
+    def __init__(
+        self,
+        model: ClassifierWrapper,
+        dataset: ClassificationDataset,
+        interval: int = 50,
+    ):
+        super().__init__(model, dataset, interval)
 
-        self.preds = []
-        self.confs = []
-
-    def setup(self, source_directory: Path, initial: pl.DataFrame = None) -> None:
-        if initial is None:
-            self.labels = {
-                "filename": [],
-                "label": [],
-            }
-        else:
-            self.labels = initial.to_dict(as_series=False)
-
-        self.dataset = TextClassificationDataset(
-            source_directory, self.labels, self.model.class_map
-        )
-
-        if len(self.dataset) == 0:
+        if len(dataset) == 0:
             raise LabelingError("No data to label")
 
-        self.confs = [0 for _ in range(len(self.dataset))]
-        self.preds = [self.model.classes[c] for c in self.confs]
+        self.preds = [0 for _ in range(len(dataset))]
+        self.confs = [self.model.classes[c] for c in self.confs]
 
     def next_sample(self) -> Tuple[str, Any, Any, float]:
         if self.dataset.count_unlabelled_samples() < 1:

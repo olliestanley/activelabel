@@ -1,7 +1,5 @@
-from pathlib import Path
 from typing import Any, Tuple
 
-import polars as pl
 from torch.utils.data import Dataset
 
 
@@ -21,15 +19,19 @@ class ClassifierWrapper(ModelWrapper):
         self.class_map = {cl: i for i, cl in enumerate(classes)}
 
 
-class LabelJob:
-    def __init__(self, model: ModelWrapper, interval: int = 50):
-        self.model = model
-        self.interval = interval
-
-    def setup(self, source_directory: Path, initial: pl.DataFrame = None) -> None:
-        """Raises LabelingError if no data to label."""
-
+class ClassificationDataset(Dataset):
+    def has_label(self, index: int) -> bool:
         raise NotImplementedError("Implement this method.")
+
+    def count_unlabelled_samples(self) -> int:
+        raise NotImplementedError("Implement this method.")
+
+
+class LabelJob:
+    def __init__(self, model: ModelWrapper, dataset: Dataset, interval: int = 50):
+        self.model = model
+        self.dataset = dataset
+        self.interval = interval
 
     def next_sample(self) -> Tuple[str, Any, Any, float]:
         """Raises LabelingError if no more samples to label."""

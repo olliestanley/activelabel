@@ -8,6 +8,7 @@ import polars as pl
 import yaml
 
 from activelabel import LabelJob
+from activelabel.text.data import TextClassificationDataset
 from activelabel.text.jobs import TextClassificationLabelJob
 from activelabel.text.models import Word2VecSVCTextClassifier
 from activelabel.util import LabelingError
@@ -54,20 +55,27 @@ def label_sample(label_job: LabelJob) -> JobStatus:
     if label == "exit":
         return JobStatus.EXIT
 
-    label_job.labels["filename"].append(identifier)
-    label_job.labels["label"].append(label)
+    # TODO: this depends on the type of label job, is currently specific to TextClassificationLabelJob
+    # needs changing to be more general
+    label_job.dataset.labels["filename"].append(identifier)
+    label_job.dataset.labels["label"].append(label)
     return JobStatus.OK
 
 
-def get_job(mode: str, label_type: str, interval: int) -> LabelJob:
+def get_job(
+    mode: str,
+    label_type: str,
+    source: Path,
+    initial_labels: pl.DataFrame,
+    interval: int,
+) -> LabelJob:
     if mode == "text":
         if label_type == "class":
             model = Word2VecSVCTextClassifier(["+", "-", "="])
-            return TextClassificationLabelJob(model, interval=interval)
+            dataset = TextClassificationDataset.from_files(source, model.class_map, initial_labels)
+            return TextClassificationLabelJob(model, dataset, interval=interval)
 
-    raise NotImplementedError(
-        f"Unavailable mode / label type combination: {mode} / {label_type}"
-    )
+    raise NotImplementedError(f"Unavailable mode / label type combination: {mode} / {label_type}")
 
 
 @dataclass
@@ -93,13 +101,12 @@ def main(config_dict: dict[str, Any]) -> None:
 
     initial_df = pl.read_csv(config.initial) if config.initial.exists() else None
 
-    label_job = get_job(config.mode, config.label_type, config.interval)
-    label_job.setup(config.source, initial_df)
+    label_job = get_job(config.mode, config.label_type, config.source, initial_df, config.interval)
 
     perform_labelling(label_job)
     # TODO: save model
 
-    label_df = pl.from_dict(label_job.labels)
+    label_df = pl.from_dict(label_job.dataset.labels)
     label_df.write_csv(config.out)
 
 
