@@ -3,7 +3,7 @@ from pathlib import Path
 
 import polars as pl
 
-from activelabel.bases import ClassificationDataset
+from activelabel import ClassificationDataset
 from activelabel.util import CachedFunctionKV, get_text
 
 TEXT_EXTENSIONS = [".txt"]

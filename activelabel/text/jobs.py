@@ -3,7 +3,7 @@ from typing import Any, Tuple
 import numpy as np
 import polars as pl
 
-from activelabel.bases import ClassificationDataset, ClassifierWrapper, LabelJob
+from activelabel import ClassificationDataset, ClassifierWrapper, LabelJob
 from activelabel.util import LabelingError
 
 
@@ -19,8 +19,8 @@ class TextClassificationLabelJob(LabelJob):
         if len(dataset) == 0:
             raise LabelingError("No data to label")
 
-        self.preds = [0 for _ in range(len(dataset))]
-        self.confs = [self.model.classes[c] for c in self.confs]
+        self.confs = [0 for _ in range(len(dataset))]
+        self.preds = [self.model.classes[c] for c in self.confs]
 
     def next_sample(self) -> Tuple[str, Any, Any, float]:
         if self.dataset.count_unlabelled_samples() < 1:

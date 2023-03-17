@@ -2,7 +2,7 @@ from typing import Tuple
 
 from torch.utils.data import Dataset
 
-from activelabel.bases import ClassifierWrapper
+from activelabel import ClassifierWrapper
 
 
 class CNNTextClassifier(ClassifierWrapper):

@@ -8,9 +8,7 @@ import polars as pl
 import yaml
 
 from activelabel import LabelJob
-from activelabel.text.data import TextClassificationDataset
-from activelabel.text.jobs import TextClassificationLabelJob
-from activelabel.text.models import Word2VecSVCTextClassifier
+from activelabel.text import TextClassificationDataset, TextClassificationLabelJob, Word2VecSVCTextClassifier
 from activelabel.util import LabelingError
 
 

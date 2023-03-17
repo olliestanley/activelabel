@@ -6,7 +6,7 @@ import numpy as np
 from sklearn import svm
 from torch.utils.data import Dataset
 
-from activelabel.bases import ClassifierWrapper
+from activelabel import ClassifierWrapper
 
 
 class Word2VecSVCTextClassifier(ClassifierWrapper):
