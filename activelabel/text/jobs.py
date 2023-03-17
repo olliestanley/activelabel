@@ -33,7 +33,7 @@ class TextClassificationLabelJob(LabelJob):
             confs[index] = 10
             index = np.argmin(confs)
 
-        return self.dataset.files[index], index, self.preds[index], confs[index]
+        return self.dataset.files[index], self.dataset[index][0], self.preds[index], confs[index]
 
     def add_label(self, identifier: str, label: Any) -> None:
         self.dataset.labels["filename"].append(identifier)
